@@ -1,0 +1,11 @@
+{
+  "name": "eclective",
+  "owner": { "name": "Max Pfeiffer", "email": "max@pfeiffer-ai.com" },
+  "plugins": [
+    {
+      "name": "eclective-atlas",
+      "source": "./plugin",
+      "description": "MCP access to Eclective venue reporting, with a bundled skill that teaches the data conventions and tools. Requires a Personal Access Token in $ECLECTIVE_PAT."
+    }
+  ]
+}

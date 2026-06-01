@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "eclective": {
+      "type": "http",
+      "url": "https://api.novus.pfeifferai-demo.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${ECLECTIVE_PAT}"
+      }
+    }
+  }
+}
