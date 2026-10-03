@@ -1,6 +1,6 @@
 # Eclective Atlas — Claude Code plugin
 
-Connect Claude Code to the **Eclective reporting** data in one step. This
+Connect Claude Code to **Eclective reporting and Mystery Diner coordination** in one step. This
 repo is a Claude Code **plugin marketplace** containing a single plugin
 (`eclective-atlas`) that bundles:
 
@@ -64,3 +64,15 @@ PAT:
 `_heatmap`, and `query_sql` (one read-only SELECT over the allowlisted
 reporting tables, scoped to your venues). See the bundled
 [`plugin/skills/eclective-data/SKILL.md`](plugin/skills/eclective-data/SKILL.md).
+
+
+## Mystery Diner coordination (1.1.0)
+
+Superadmins can use their agent to match diners, inspect template briefings,
+schedule visits, edit saved briefings, follow progress, nudge diners and manage
+report publication. The same briefing can be edited in Atlas. Scheduling and
+nudges send notifications; reporting tools and SQL remain read-only.
+
+Requires the MUN-47 API release. Until that API is deployed, the new coordinator
+tools will not be available. See `plugin/skills/eclective-data/SKILL.md` for the
+full tool contract, retry behavior and default spend caps.

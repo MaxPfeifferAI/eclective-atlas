@@ -3,17 +3,18 @@ name: eclective-data
 description: >-
   Query Eclective Hospitality's weekly venue reporting data — revenue,
   covers, budgets, KPIs, labour, COGS, reviews, email/web marketing,
-  delivery, and booking heatmaps — through the `eclective` MCP server.
+  delivery, booking heatmaps and Mystery Diner coordination — through the `eclective` MCP server.
   Use whenever the user asks about venue performance, a weekly report,
-  portfolio/group totals, or wants ad-hoc SQL over the reporting tables.
+  portfolio/group totals, ad-hoc SQL, diner matching, visit scheduling, briefings or report publication.
 ---
 
 # Eclective reporting data
 
-You have access to the **`eclective`** MCP server: read-only access to
-Eclective Hospitality's weekly venue reporting. Every call is scoped to
-the venues the caller's Personal Access Token (PAT) can see — you never
-see more than the token's owner can.
+The **`eclective`** MCP server provides venue-scoped reporting reads and
+superadmin-only Mystery Diner operations. Coordinator tools can create or edit
+assignments, email diners, send push notifications and change publication.
+Use them only within the user's requested scope. Reporting SQL remains read-only;
+never use SQL to bypass the coordinator endpoints or their role checks.
 
 If the tools error with **401 / "invalid or missing Personal Access
 Token"**, the user hasn't set their PAT. Tell them to mint one at the
@@ -29,7 +30,7 @@ var). The secret is shown only once at creation.
 - **`week_start` is the Monday of an ISO week**, `YYYY-MM-DD`. There is no
   "week number" parameter — resolve to the Monday date first.
 
-## Start every session with discovery
+## Start reporting work with discovery
 
 1. `list_weeks` → which weeks have data (newest is usually the one to use
    if the user says "last week" / doesn't specify).
@@ -88,3 +89,53 @@ LIMIT 5
 
 When you present figures to the user, convert cents → euros and decimals
 → percent. State the `week_start` you used so they can confirm the period.
+
+
+## Mystery Diner coordinator
+
+Brian primarily runs this through his agent. Atlas is the companion frontend for
+viewing and editing the same saved briefings. All tools call the same REST API,
+with the caller's identity and existing superadmin permissions.
+
+1. `list_open_venues()` to get a real venue slug. Neighbourhood Naas is an external
+   test venue; do not treat it as part of the Eclective programme. Test Kitchen is
+   available for QA. Never change venue eligibility to make an assignment work.
+2. `match_diners(venue_slug, visit_date, limit?)` to see ranked eligible diners.
+   Explain the reasons for a recommendation. Availability is free text: read it
+   before selecting a diner. Do not claim the venue is booked by scheduling it.
+3. `get_briefing_defaults(venue_slug, playbook?)` to inspect the default briefing.
+   Premium EUR180, casual EUR120, bars EUR80; money arguments are integer cents.
+   There is no default booking URL: use a verified URL for the selected venue.
+4. `schedule_visit(diner_id, venue_slug, visit_date, client_schedule_id,
+   playbook?, briefing_overrides?)` creates the assignment with defaults plus
+   supplied overrides. Generate a UUID for `client_schedule_id` and reuse the
+   same ID and request on a timeout/retry. A new UUID means a new assignment.
+   Scheduling notifies the diner. Return the saved briefing, not a guessed draft.
+5. `update_diner_visit(visit_id, briefing_overrides?, visit_date?, status?)`
+   merges only supplied briefing fields; null clears a field. The other values
+   remain unchanged. Changes may notify the diner. Submitted visits are immutable.
+
+Pool and progress tools:
+
+| Tool | Purpose |
+| --- | --- |
+| `list_diners(status?)` | Profiles, completeness and active/applicant/inactive status |
+| `approve_diner(id)` | Activate an applicant and send the approval email |
+| `set_diner_status(id, status)` | Change pool status; use approve_diner for applicant approval |
+| `list_visits(week_start?, status?)` | Progress timestamps, briefing and publication; week_start is Monday |
+| `get_diner_visit(visit_id)` | Saved assignment and capture evidence |
+| `nudge_diner(visit_id)` | State-specific push + email; one per visit/state/day in Dublin time |
+| `get_diner_report(visit_id)` | Calculated scores, recorded answers and available AI narrative |
+| `unpublish_report(visit_id)` | Remove the report from venue reporting while preserving its evidence |
+| `republish_report(visit_id)` | Restore an unpublished submitted report |
+
+A valid submission publishes automatically. `approved_at` indicates publication;
+there is no routine report approval gate. The AI summary may arrive later and
+never changes scores or publication. Empty narrative does not mean unpublished.
+If the user unpublishes a report, retries and later narrative writes must leave
+it unpublished. Never invent answers or ratings to make a report look complete.
+
+Nudge responses contain independent push/email statuses. `sent` means accepted
+by the provider, not read by the diner. Report `failed`, `skipped`, `no_token`,
+`partial` or `pending` honestly. Repeating the same nudge that day returns its
+recorded outcomes; do not promise a retry will resend it. There is no scheduler.
