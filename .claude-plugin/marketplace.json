@@ -5,7 +5,7 @@
     {
       "name": "eclective-atlas",
       "source": "./plugin",
-      "description": "MCP access to Eclective venue reporting, with a bundled skill that teaches the data conventions and tools. Requires a Personal Access Token in $ECLECTIVE_PAT."
+      "description": "MCP access to Eclective reporting and Mystery Diner approvals, scheduling and coordination, using your existing permissions. Requires a Personal Access Token in $ECLECTIVE_PAT."
     }
   ]
 }

@@ -5,7 +5,8 @@ description: >-
   covers, budgets, KPIs, labour, COGS, reviews, email/web marketing,
   delivery, booking heatmaps and Mystery Diner coordination — through the `eclective` MCP server.
   Use whenever the user asks about venue performance, a weekly report,
-  portfolio/group totals, ad-hoc SQL, diner matching, visit scheduling, briefings or report publication.
+  portfolio/group totals, ad-hoc SQL, diner applications and approvals, matching,
+  visit scheduling, briefings, reminders or report publication.
 ---
 
 # Eclective reporting data
@@ -16,11 +17,13 @@ assignments, email diners, send push notifications and change publication.
 Use them only within the user's requested scope. Reporting SQL remains read-only;
 never use SQL to bypass the coordinator endpoints or their role checks.
 
-If the tools error with **401 / "invalid or missing Personal Access
-Token"**, the user hasn't set their PAT. Tell them to mint one at the
-dashboard **Settings → API tokens** page and export it:
+If connecting to MCP fails with **401**, check for a missing, expired or revoked
+PAT. The user can mint one at the dashboard **Settings → API tokens** page and export it:
 `export ECLECTIVE_PAT=ec_pat_…` (the plugin's MCP config reads that env
-var). The secret is shown only once at creation.
+var). The secret is shown only once at creation. If reporting works but Mystery
+Diner tools return 401/403, the user may lack management access. Replacing the PAT
+does not grant a role. The API checks current roles, including additive grants,
+on every call. Never request or expose the service API key.
 
 ## Conventions — read these before interpreting any number
 
@@ -93,13 +96,16 @@ When you present figures to the user, convert cents → euros and decimals
 
 ## Mystery Diner coordinator
 
-Brian primarily runs this through his agent. Atlas is the companion frontend for
-viewing and editing the same saved briefings. All tools call the same REST API,
-with the caller's identity and existing superadmin permissions.
+Atlas is the companion frontend for viewing and editing the same saved briefings.
+All tools call the same REST API, with the caller's identity and existing
+superadmin permissions. No interactive browser session is required for these
+calls. In a headless run, use the caller's task and configured tool permissions as
+authorization; do not add an approval pause for actions they already requested.
+Do not contact diners during an audit or read-only reporting task.
 
-1. `list_open_venues()` to get a real venue slug. Neighbourhood Naas is an external
-   test venue; do not treat it as part of the Eclective programme. Test Kitchen is
-   available for QA. Never change venue eligibility to make an assignment work.
+1. `list_open_venues()` to get a schedulable venue slug. This registry includes
+   external venues excluded from reporting's `list_venues()`. Never change venue
+   eligibility to make an assignment work.
 2. `match_diners(venue_slug, visit_date, limit?)` to see ranked eligible diners.
    Explain the reasons for a recommendation. Availability is free text: read it
    before selecting a diner. Do not claim the venue is booked by scheduling it.
