@@ -1,9 +1,18 @@
 {
   "name": "eclective-atlas",
   "displayName": "Eclective Atlas",
-  "description": "Query Eclective Hospitality's weekly venue reporting (revenue, covers, labour, COGS, reviews, marketing) from your coding agent — scoped to the venues your Personal Access Token can see.",
-  "version": "1.0.0",
-  "author": { "name": "Max Pfeiffer", "email": "max@pfeiffer-ai.com" },
+  "description": "Venue-scoped Eclective reporting and superadmin Mystery Diner coordination: match diners, schedule visits, edit template briefings and manage publication through MCP.",
+  "version": "1.1.0",
+  "author": {
+    "name": "Max Pfeiffer",
+    "email": "max@pfeiffer-ai.com"
+  },
   "homepage": "https://api.novus.pfeifferai-demo.com",
-  "keywords": ["mcp", "eclective", "reporting", "hospitality", "analytics"]
+  "keywords": [
+    "mcp",
+    "eclective",
+    "reporting",
+    "hospitality",
+    "analytics"
+  ]
 }

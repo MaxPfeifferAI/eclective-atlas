@@ -1,6 +1,6 @@
 # Eclective Atlas — Claude Code plugin
 
-Connect Claude Code to the **Eclective reporting** data in one step. This
+Connect Claude Code to **Eclective reporting and Mystery Diner coordination** in one step. This
 repo is a Claude Code **plugin marketplace** containing a single plugin
 (`eclective-atlas`) that bundles:
 
@@ -37,7 +37,15 @@ repo is a Claude Code **plugin marketplace** containing a single plugin
 Verify with `/mcp` (you should see `eclective` connected), then try:
 *"List the venues I can see, then show last week's overview."*
 
-To upgrade later: pull the latest and re-run `/plugin install`.
+To upgrade an existing install, run in your shell:
+
+```bash
+claude plugin marketplace update eclective
+claude plugin update eclective-atlas@eclective
+```
+
+Restart your session or run `/reload-plugins` to load the updated skill and tools.
+See the [Claude Code update instructions](https://code.claude.com/docs/en/discover-plugins#update-plugins-now).
 
 ## Other agents (same token)
 
@@ -64,3 +72,18 @@ PAT:
 `_heatmap`, and `query_sql` (one read-only SELECT over the allowlisted
 reporting tables, scoped to your venues). See the bundled
 [`plugin/skills/eclective-data/SKILL.md`](plugin/skills/eclective-data/SKILL.md).
+
+
+## Mystery Diner coordination (1.1.0)
+
+Superadmins can use their agent to match diners, inspect template briefings,
+approve applicants, schedule visits, edit saved briefings, follow progress, nudge diners and manage
+report publication. The same briefing can be edited in Atlas. Scheduling and
+nudges send notifications; reporting tools and SQL remain read-only.
+
+The coordinator tools are available on the existing MCP URL with your existing
+credentials. Reporting access alone does not grant diner management access.
+Calls work headlessly: configure your client's tool allowlist for the requested
+workflow, including its write tools, and retain each scheduling UUID for retries.
+See `plugin/skills/eclective-data/SKILL.md` for the full tool contract, retry
+behavior and default spend caps.
