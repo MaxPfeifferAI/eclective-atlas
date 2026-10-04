@@ -145,3 +145,42 @@ Nudge responses contain independent push/email statuses. `sent` means accepted
 by the provider, not read by the diner. Report `failed`, `skipped`, `no_token`,
 `partial` or `pending` honestly. Repeating the same nudge that day returns its
 recorded outcomes; do not promise a retry will resend it. There is no scheduler.
+
+
+## Full Mystery Diner templates
+
+Use the template catalogue for reusable visit setups. Each definition contains
+`name`, `description`, `scan` and `briefing_defaults`. The scan covers booking,
+capture steps and copy, live prompts, photo requirements, experience questions,
+standards categories, scoring weights, rollups and briefing display fields.
+Only `briefing_defaults` populates assignments; legacy `scan.briefing.example`
+is illustrative. Template writes require Mystery Diner access and send no messages.
+
+1. `list_diner_templates(include_archived?)` discovers the current catalogue.
+   Premium, Casual, Bars and QA short are included. Atlas displays the same
+   full catalogue at Mystery Diner → Templates.
+2. `get_diner_template(slug, revision?)` returns a complete current or historical
+   definition. `get_diner_template_schema()` describes all supported fields.
+3. To create a variant, copy a suitable definition, change the requested values,
+   and call `create_diner_template(slug, definition)` with a unique lower-case
+   slug. Pass only the four editable keys in `definition`, not response metadata.
+4. To revise, read the current template first, then call
+   `update_diner_template(slug, expected_revision, definition)`. Supply the full
+   definition. The server creates an immutable revision for future assignments;
+   it owns `scan.version`. On 409, reread and reconcile before retrying.
+5. `set_diner_template_archived(slug, expected_revision, archived)` archives or
+   restores. Archived templates cannot be assigned, but existing visits still
+   work. Archiving a venue default requires selecting another template explicitly
+   when scheduling; it does not silently select a different default.
+6. `get_briefing_defaults` and `schedule_visit` accept `template_slug` and optional
+   `template_revision`. Select the inspected revision when exact contents matter.
+   Do not combine `template_slug` and legacy `playbook`. Every new assignment
+   freezes the complete scan and saves its own briefing. Catalogue revisions and
+   archival cannot alter an assigned or submitted visit's questionnaire or scores.
+
+Identical create/update retries are safe. Changes become available immediately
+for future visits; there is no separate template publishing step. Preserve all
+unrequested content when editing. The app supports rating, yes/no, yes/no/N/A
+and information questions; arbitrary code, new widget types and AI scoring
+formulas are not supported. Do not weaken photo requirements or scoring rules
+unless the user asked. QA short is for Test Kitchen only.
