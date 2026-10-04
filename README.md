@@ -87,3 +87,11 @@ Calls work headlessly: configure your client's tool allowlist for the requested
 workflow, including its write tools, and retain each scheduling UUID for retries.
 See `plugin/skills/eclective-data/SKILL.md` for the full tool contract, retry
 behavior and default spend caps.
+
+
+The Mystery Diner catalogue is visible in Atlas → Mystery Diner → Templates.
+With version 1.2.0, your connected agent can read, create, revise and archive
+complete templates, including the visit steps, questionnaire, weights, photo
+rules and briefing defaults. Schedule with `template_slug` and optionally a
+specific revision. Assigned visits keep their original template. Refresh the
+MCP tool catalogue after installing the update; existing credentials still work.
